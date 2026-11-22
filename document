@@ -1,0 +1,37 @@
+Part 1: Prepare the server (SSH into your Jenkins EC2)
+Step 1: Install nginx
+Part 1: Prepare the server (SSH into your Jenkins EC2)
+Step 1: Install nginx
+
+  Step 2: Let Jenkins write to the web folder
+    # Amazon Linux: web folder is /usr/share/nginx/html
+     sudo chown -R jenkins:jenkins /usr/share/nginx/html
+  # Ubuntu: web folder is /var/www/html
+    sudo chown -R jenkins:jenkins /var/www/html
+
+      Step 3: Add the trigger
+        Under Triggers, tick Poll SCM and enter this in the Schedule box:
+          H/5 * * * *
+
+          Step 4: Add the pipeline
+            Ex:- 
+ pipeline {
+    agent any
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Gauravkyariya/jenkins-project.git'
+            }
+        }
+        stage('Validate') {
+            steps {
+                sh 'test -f index.html && test -f script.js && test -f style.css'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh 'cp -r index.html script.js style.css /usr/share/nginx/html/'
+            }
+        }
+    }
+}
